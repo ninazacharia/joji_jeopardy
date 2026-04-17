@@ -664,18 +664,21 @@
 
             let tileIndex = 0;
             for (let i = 0; i < 5; i++) {
-                categories.forEach(category => {
+                categories.forEach((category, catIndex) => {
                     const tile = document.createElement('div');
                     tile.className = 'tile';
                     tile.textContent = questions[category][i].value;
-                    tile.dataset.tileId = tileIndex;
+                    const currentTileId = tileIndex;
+                    tile.dataset.tileId = currentTileId;
 
-                    if (revealedTiles.has(tileIndex)) {
-                        console.log('Tile', tileIndex, 'should be revealed');
+                    if (revealedTiles.has(currentTileId)) {
+                        console.log('Tile', currentTileId, 'should be revealed');
                         tile.classList.add('revealed');
                     }
 
-                    tile.onclick = () => openModal(category, i, tileIndex);
+                    tile.onclick = function() {
+                        openModal(category, i, currentTileId);
+                    };
                     board.appendChild(tile);
                     tileIndex++;
                 });
