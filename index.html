@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Joji & Bran's Wedding Jeopardy</title>
+    <title>🤠 Jojo's Bachelorette Jeopardy 💕</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Rye&family=Caveat:wght@700&display=swap');
 
@@ -35,7 +35,7 @@
         }
 
         body::before {
-            content: '✨ ⭐ 🤠 💕 ✨ ⭐ 🤠 💕 ✨ ⭐ 🤠 💕 ✨ ⭐ 🤠 💕';
+            content: '✨ ⭐ 🤠 💕 👢 ✨ ⭐ 🤠 💕 👢 ✨ ⭐ 🤠 💕 👢 ✨ ⭐';
             position: fixed;
             top: 0;
             left: 0;
@@ -88,11 +88,11 @@
         }
 
         h1::before {
-            content: '🤠 ';
+            content: '👢 ';
         }
 
         h1::after {
-            content: ' 🤠';
+            content: ' 👢';
         }
 
         .subtitle {
@@ -329,6 +329,31 @@
             box-shadow: 0 6px 20px rgba(255, 20, 147, 0.6);
         }
 
+        .btn-team1, .btn-team2 {
+            background: linear-gradient(135deg, #ffc0cb 0%, #ff69b4 100%);
+            color: #fff;
+            flex: 1;
+        }
+
+        .btn-team1:hover, .btn-team2:hover {
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+            transform: scale(1.1) rotate(-2deg);
+            box-shadow: 0 6px 20px rgba(255, 105, 180, 0.8);
+        }
+
+        .btn-clear {
+            background: linear-gradient(135deg, #c44569 0%, #8b3a62 100%);
+            color: #fff;
+            padding: 12px 25px;
+            font-size: 1rem;
+        }
+
+        .btn-clear:hover {
+            background: linear-gradient(135deg, #8b3a62 0%, #5a2445 100%);
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(139, 58, 98, 0.8);
+        }
+
         .scoreboard {
             display: flex;
             justify-content: center;
@@ -346,7 +371,7 @@
         }
 
         .score::before {
-            content: '🤠';
+            content: '👢';
             position: absolute;
             top: -15px;
             left: 50%;
@@ -354,12 +379,29 @@
             font-size: 2rem;
         }
 
-        .score-label {
+        .team-name-input {
             font-size: 1.2rem;
             color: #fff;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid #fff;
+            border-radius: 10px;
+            padding: 8px 12px;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+            text-align: center;
             font-family: 'Caveat', cursive;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+            width: 100%;
+        }
+
+        .team-name-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .team-name-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.3);
+            border-color: #ffffcc;
+            box-shadow: 0 0 10px rgba(255, 255, 204, 0.5);
         }
 
         .score-value {
@@ -441,7 +483,7 @@
 
         <div class="scoreboard">
             <div class="score">
-                <div class="score-label">Team 1</div>
+                <input type="text" class="team-name-input" id="teamName1" placeholder="Team 1 Name" value="Team 1" onchange="updateTeamName(1)">
                 <div class="score-value" id="score1">0</div>
                 <div class="score-buttons">
                     <button class="score-btn" onclick="adjustScore(1, 'add')">+</button>
@@ -450,7 +492,7 @@
                 </div>
             </div>
             <div class="score">
-                <div class="score-label">Team 2</div>
+                <input type="text" class="team-name-input" id="teamName2" placeholder="Team 2 Name" value="Team 2" onchange="updateTeamName(2)">
                 <div class="score-value" id="score2">0</div>
                 <div class="score-buttons">
                     <button class="score-btn" onclick="adjustScore(2, 'add')">+</button>
@@ -461,6 +503,10 @@
         </div>
 
         <div class="board" id="board"></div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="btn btn-clear" onclick="clearEverything()">Clear Everything & Start Over 🔄</button>
+        </div>
     </div>
 
     <div class="modal" id="modal">
@@ -471,6 +517,10 @@
             <div class="modal-buttons">
                 <button class="btn btn-show" id="showAnswerBtn" onclick="showAnswer()">Show Answer</button>
                 <button class="btn btn-close" onclick="closeModal()">Close</button>
+            </div>
+            <div class="modal-buttons" id="teamButtons" style="display: none;">
+                <button class="btn btn-team1" id="teamBtn1" onclick="awardPoints(1)">Team 1 Gets Points! 👢</button>
+                <button class="btn btn-team2" id="teamBtn2" onclick="awardPoints(2)">Team 2 Gets Points! 👢</button>
             </div>
         </div>
     </div>
@@ -533,6 +583,38 @@
         let currentQuestion = null;
         let scores = { 1: 0, 2: 0 };
         let currentValue = 0;
+        let teamNames = { 1: 'Team 1', 2: 'Team 2' };
+        let revealedTiles = new Set();
+
+        function loadGameState() {
+            const savedScores = localStorage.getItem('jeopardy_scores');
+            const savedTeamNames = localStorage.getItem('jeopardy_teamNames');
+            const savedRevealed = localStorage.getItem('jeopardy_revealed');
+
+            if (savedScores) {
+                scores = JSON.parse(savedScores);
+                document.getElementById('score1').textContent = scores[1];
+                document.getElementById('score2').textContent = scores[2];
+            }
+
+            if (savedTeamNames) {
+                teamNames = JSON.parse(savedTeamNames);
+                document.getElementById('teamName1').value = teamNames[1];
+                document.getElementById('teamName2').value = teamNames[2];
+                document.getElementById('teamBtn1').textContent = `${teamNames[1]} Gets Points! 👢`;
+                document.getElementById('teamBtn2').textContent = `${teamNames[2]} Gets Points! 👢`;
+            }
+
+            if (savedRevealed) {
+                revealedTiles = new Set(JSON.parse(savedRevealed));
+            }
+        }
+
+        function saveGameState() {
+            localStorage.setItem('jeopardy_scores', JSON.stringify(scores));
+            localStorage.setItem('jeopardy_teamNames', JSON.stringify(teamNames));
+            localStorage.setItem('jeopardy_revealed', JSON.stringify([...revealedTiles]));
+        }
 
         function initBoard() {
             const board = document.getElementById('board');
@@ -544,18 +626,28 @@
                 board.appendChild(categoryDiv);
             });
 
+            let tileIndex = 0;
             for (let i = 0; i < 5; i++) {
                 categories.forEach(category => {
                     const tile = document.createElement('div');
                     tile.className = 'tile';
                     tile.textContent = questions[category][i].value;
-                    tile.onclick = () => openModal(category, i);
+                    tile.dataset.tileId = tileIndex;
+
+                    if (revealedTiles.has(tileIndex)) {
+                        tile.classList.add('revealed');
+                    }
+
+                    tile.onclick = () => openModal(category, i, tileIndex);
                     board.appendChild(tile);
+                    tileIndex++;
                 });
             }
+
+            loadGameState();
         }
 
-        function openModal(category, index) {
+        function openModal(category, index, tileId) {
             const tile = event.target;
             if (tile.classList.contains('revealed')) return;
 
@@ -570,17 +662,44 @@
             document.getElementById('modal').classList.add('active');
 
             tile.classList.add('revealed');
+            revealedTiles.add(tileId);
+            saveGameState();
         }
 
         function showAnswer() {
             document.getElementById('modalAnswer').classList.add('visible');
             document.getElementById('showAnswerBtn').style.display = 'none';
+            document.getElementById('teamButtons').style.display = 'flex';
         }
 
         function closeModal() {
             document.getElementById('modal').classList.remove('active');
+            document.getElementById('teamButtons').style.display = 'none';
             currentQuestion = null;
             currentValue = 0;
+        }
+
+        function awardPoints(team) {
+            scores[team] += currentValue;
+            document.getElementById(`score${team}`).textContent = scores[team];
+            saveGameState();
+            closeModal();
+        }
+
+        function updateTeamName(team) {
+            const newName = document.getElementById(`teamName${team}`).value || `Team ${team}`;
+            teamNames[team] = newName;
+            document.getElementById(`teamBtn${team}`).textContent = `${newName} Gets Points! 👢`;
+            saveGameState();
+        }
+
+        function clearEverything() {
+            if (confirm('Are you sure you want to clear all scores, team names, and reset the board? This cannot be undone!')) {
+                localStorage.removeItem('jeopardy_scores');
+                localStorage.removeItem('jeopardy_teamNames');
+                localStorage.removeItem('jeopardy_revealed');
+                location.reload();
+            }
         }
 
         function adjustScore(team, action) {
@@ -590,11 +709,13 @@
                 scores[team] -= currentValue || 100;
             }
             document.getElementById(`score${team}`).textContent = scores[team];
+            saveGameState();
         }
 
         function resetScore(team) {
             scores[team] = 0;
             document.getElementById(`score${team}`).textContent = scores[team];
+            saveGameState();
         }
 
         window.onclick = function(event) {
