@@ -593,16 +593,23 @@
 
             if (savedScores) {
                 scores = JSON.parse(savedScores);
-                document.getElementById('score1').textContent = scores[1];
-                document.getElementById('score2').textContent = scores[2];
+                const score1El = document.getElementById('score1');
+                const score2El = document.getElementById('score2');
+                if (score1El) score1El.textContent = scores[1];
+                if (score2El) score2El.textContent = scores[2];
             }
 
             if (savedTeamNames) {
                 teamNames = JSON.parse(savedTeamNames);
-                document.getElementById('teamName1').value = teamNames[1];
-                document.getElementById('teamName2').value = teamNames[2];
-                document.getElementById('teamBtn1').textContent = `${teamNames[1]} Gets Points! 👢`;
-                document.getElementById('teamBtn2').textContent = `${teamNames[2]} Gets Points! 👢`;
+                const teamName1El = document.getElementById('teamName1');
+                const teamName2El = document.getElementById('teamName2');
+                const teamBtn1El = document.getElementById('teamBtn1');
+                const teamBtn2El = document.getElementById('teamBtn2');
+
+                if (teamName1El) teamName1El.value = teamNames[1];
+                if (teamName2El) teamName2El.value = teamNames[2];
+                if (teamBtn1El) teamBtn1El.textContent = `${teamNames[1]} Gets Points! 👢`;
+                if (teamBtn2El) teamBtn2El.textContent = `${teamNames[2]} Gets Points! 👢`;
             }
 
             if (savedRevealed) {
@@ -618,6 +625,7 @@
 
         function initBoard() {
             loadGameState();
+            console.log('Revealed tiles on load:', revealedTiles);
 
             const board = document.getElementById('board');
 
@@ -663,6 +671,7 @@
 
             tile.classList.add('revealed');
             revealedTiles.add(tileId);
+            console.log('Added tile', tileId, 'to revealed. Set:', revealedTiles);
             saveGameState();
         }
 
