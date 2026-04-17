@@ -617,6 +617,8 @@
         }
 
         function initBoard() {
+            loadGameState();
+
             const board = document.getElementById('board');
 
             categories.forEach(category => {
@@ -643,8 +645,6 @@
                     tileIndex++;
                 });
             }
-
-            loadGameState();
         }
 
         function openModal(category, index, tileId) {
