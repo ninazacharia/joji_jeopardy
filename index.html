@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joji & Bran's Wedding Jeopardy</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rye&family=Caveat:wght@700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        body {
+            font-family: 'Rye', cursive;
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 50%, #8b3a62 100%);
+            background-attachment: fixed;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '✨ ⭐ 🤠 💕 ✨ ⭐ 🤠 💕 ✨ ⭐ 🤠 💕 ✨ ⭐ 🤠 💕';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            font-size: 2rem;
+            padding: 10px;
+            background: rgba(255, 182, 193, 0.3);
+            border-bottom: 3px dashed #ffb6c1;
+            text-align: center;
+            z-index: 0;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle, rgba(255, 255, 255, 0.8) 1px, transparent 1px),
+                radial-gradient(circle, rgba(255, 192, 203, 0.6) 1px, transparent 1px);
+            background-size: 50px 50px, 80px 80px;
+            background-position: 0 0, 40px 40px;
+            pointer-events: none;
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            padding-top: 60px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            color: #fff;
+            text-shadow:
+                3px 3px 0 #ff1493,
+                6px 6px 0 #ffb6c1,
+                9px 9px 20px rgba(0, 0, 0, 0.5);
+            font-family: 'Rye', cursive;
+            letter-spacing: 3px;
+        }
+
+        h1::before {
+            content: '🤠 ';
+        }
+
+        h1::after {
+            content: ' 🤠';
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: #ffb6c1;
+            font-family: 'Caveat', cursive;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            letter-spacing: 2px;
+        }
+
+        .subtitle::before {
+            content: '💕 ';
+        }
+
+        .subtitle::after {
+            content: ' 💕';
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .category {
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+            padding: 20px 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border: 4px dashed #fff;
+            text-transform: uppercase;
+            color: #fff;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category::before {
+            content: '⭐';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            font-size: 1.2rem;
+            animation: sparkle 1.5s ease-in-out infinite;
+        }
+
+        .category::after {
+            content: '⭐';
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            font-size: 1.2rem;
+            animation: sparkle 1.5s ease-in-out infinite 0.75s;
+        }
+
+        .tile {
+            background: linear-gradient(135deg, #ffc0cb 0%, #ffb6c1 100%);
+            border: 4px solid #ff69b4;
+            padding: 40px 20px;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #c44569;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tile::before {
+            content: '✨';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 1.5rem;
+            opacity: 0.7;
+        }
+
+        .tile:hover:not(.revealed) {
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+            color: #fff;
+            transform: scale(1.05) rotate(-2deg);
+            box-shadow: 0 8px 25px rgba(255, 20, 147, 0.6);
+        }
+
+        .tile.revealed {
+            background: linear-gradient(135deg, #d4a5a5 0%, #b89090 100%);
+            color: #8b6767;
+            cursor: default;
+            border-color: #b89090;
+            opacity: 0.6;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(139, 58, 98, 0.95);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ff85a2 0%, #ff69b4 100%);
+            border: 6px dashed #fff;
+            padding: 40px;
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content::before {
+            content: '🌟';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 3rem;
+            animation: sparkle 1s ease-in-out infinite;
+        }
+
+        .modal-value {
+            font-size: 3.5rem;
+            color: #fff;
+            margin-bottom: 30px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+            font-family: 'Rye', cursive;
+        }
+
+        .modal-value::before {
+            content: '⭐ ';
+        }
+
+        .modal-value::after {
+            content: ' ⭐';
+        }
+
+        .modal-question {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            line-height: 1.4;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+            font-family: 'Caveat', cursive;
+        }
+
+        .modal-answer {
+            font-size: 1.6rem;
+            color: #ffffcc;
+            display: none;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 3px dashed #fff;
+            font-family: 'Caveat', cursive;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-answer::before {
+            content: '💕 ';
+        }
+
+        .modal-answer::after {
+            content: ' 💕';
+        }
+
+        .modal-answer.visible {
+            display: block;
+        }
+
+        .modal-buttons {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border: 3px solid #fff;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-family: 'Rye', cursive;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-show {
+            background: #ffffcc;
+            color: #c44569;
+        }
+
+        .btn-show:hover {
+            background: #fff;
+            transform: scale(1.1) rotate(-3deg);
+            box-shadow: 0 6px 20px rgba(255, 255, 204, 0.6);
+        }
+
+        .btn-close {
+            background: #ff69b4;
+            color: #fff;
+        }
+
+        .btn-close:hover {
+            background: #ff1493;
+            transform: scale(1.1) rotate(3deg);
+            box-shadow: 0 6px 20px rgba(255, 20, 147, 0.6);
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .score {
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+            border: 4px dashed #fff;
+            padding: 20px 40px;
+            border-radius: 20px;
+            box-shadow: 0 6px 20px rgba(255, 105, 180, 0.5);
+            position: relative;
+        }
+
+        .score::before {
+            content: '🤠';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+        }
+
+        .score-label {
+            font-size: 1.2rem;
+            color: #fff;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+            font-family: 'Caveat', cursive;
+        }
+
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ffffcc;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .score-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .score-btn {
+            padding: 8px 18px;
+            font-size: 1rem;
+            background: #ffffcc;
+            color: #c44569;
+            border: 2px solid #fff;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .score-btn:hover {
+            background: #fff;
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .board {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 5px;
+            }
+
+            .category {
+                font-size: 0.7rem;
+                padding: 15px 5px;
+                min-height: 60px;
+            }
+
+            .tile {
+                font-size: 1.5rem;
+                padding: 30px 10px;
+                min-height: 80px;
+            }
+
+            .modal-content {
+                padding: 20px;
+            }
+
+            .modal-question {
+                font-size: 1.3rem;
+            }
+
+            .modal-answer {
+                font-size: 1.2rem;
+            }
+
+            .scoreboard {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bachelorette Jeopardy</h1>
+        <p class="subtitle">Jojo's Last Rodeo!</p>
+
+        <div class="scoreboard">
+            <div class="score">
+                <div class="score-label">Team 1</div>
+                <div class="score-value" id="score1">0</div>
+                <div class="score-buttons">
+                    <button class="score-btn" onclick="adjustScore(1, 'add')">+</button>
+                    <button class="score-btn" onclick="adjustScore(1, 'subtract')">-</button>
+                    <button class="score-btn" onclick="resetScore(1)">Reset</button>
+                </div>
+            </div>
+            <div class="score">
+                <div class="score-label">Team 2</div>
+                <div class="score-value" id="score2">0</div>
+                <div class="score-buttons">
+                    <button class="score-btn" onclick="adjustScore(2, 'add')">+</button>
+                    <button class="score-btn" onclick="adjustScore(2, 'subtract')">-</button>
+                    <button class="score-btn" onclick="resetScore(2)">Reset</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="board" id="board"></div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-value" id="modalValue"></div>
+            <div class="modal-question" id="modalQuestion"></div>
+            <div class="modal-answer" id="modalAnswer"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-show" id="showAnswerBtn" onclick="showAnswer()">Show Answer</button>
+                <button class="btn btn-close" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const categories = [
+            "Questions About the Couple",
+            "Questions About the Bride",
+            "Questions About the Groom",
+            "The Zoo",
+            "General Wedding Trivia",
+            "Famous Couples"
+        ];
+
+        const questions = {
+            "Questions About the Couple": [
+                { value: 200, question: "Where were the couple when they realized this was something more?", answer: "Ezoo (or 'a rave')" },
+                { value: 400, question: "What is the couple's go-to karaoke song they sing together?", answer: "Summer Nights" },
+                { value: 600, question: "What is the place the couple loves visiting the most?", answer: "Disney World" },
+                { value: 800, question: "What special date did the two get engaged?", answer: "July 13th, 2024" },
+                { value: 1000, question: "What are the couple's nicknames for each other?", answer: "Bran and Joji" }
+            ],
+            "Questions About the Bride": [
+                { value: 200, question: "What is Jojo's favorite hot sauce?", answer: "Sriracha" },
+                { value: 400, question: "What dorm building did Jojo live in freshman year of college?", answer: "Champagnat Hall (Champ)" },
+                { value: 600, question: "What is Jojo's master's degree in?", answer: "Integrated Marketing Communications" },
+                { value: 800, question: "What is the Bride's go-to cocktail (doesn't include wine)?", answer: "Dirty Martini" },
+                { value: 1000, question: "If the bride could go on any reality show, which one?", answer: "Real Housewives of Salt Lake City or Summer House" }
+            ],
+            "Questions About the Groom": [
+                { value: 200, question: "When is Brandon's birthday?", answer: "September 19th, 1997" },
+                { value: 400, question: "What music festival has Brandon attended the most?", answer: "Electric Forest or Ezoo" },
+                { value: 600, question: "What is the Groom's favorite sport?", answer: "Football or Soccer" },
+                { value: 800, question: "What sport did the groom play in high school?", answer: "Soccer" },
+                { value: 1000, question: "What would you typically find the groom doing outside of work as an enjoyable activity?", answer: "Playing video games" }
+            ],
+            "The Zoo": [
+                { value: 200, question: "What was Jojo's childhood cat named?", answer: "Franny" },
+                { value: 400, question: "What was Jojo's childhood dog named?", answer: "Splash" },
+                { value: 600, question: "What are 2-3 of Charlie's nicknames?", answer: "Titi, Charles (and more!)" },
+                { value: 800, question: "How old is Charlie?", answer: "" },
+                { value: 1000, question: "How much does Charlie weigh?", answer: "" }
+            ],
+            "General Wedding Trivia": [
+                { value: 200, question: "What is the most popular destination spot for a bachelorette?", answer: "Las Vegas" },
+                { value: 400, question: "Ancient Greeks believed this item protects the bride from evil spirits.", answer: "Veil" },
+                { value: 600, question: "This British monarch originated the tradition of white wedding dresses.", answer: "Queen Victoria" },
+                { value: 800, question: "Brides in India often wear this color instead of white.", answer: "Red" },
+                { value: 1000, question: "The RSVP acronym stands for this French phrase.", answer: "Répondez, s'il vous plaît" }
+            ],
+            "Famous Couples": [
+                { value: 200, question: "Angelina Jolie and Brad Pitt started dating after filming this movie together.", answer: "Mr. and Mrs. Smith" },
+                { value: 400, question: "This Game of Thrones couple got married in real life in 2018.", answer: "Kit Harington and Rose Leslie" },
+                { value: 600, question: "How long was Kim Kardashian married to Kris Humphries?", answer: "72 days" },
+                { value: 800, question: "This famous couple hosted a wedding for their bulldogs.", answer: "Chrissy Teigen and John Legend" },
+                { value: 1000, question: "This U.S. President met his First Lady at a Chicago law firm.", answer: "Barack Obama" }
+            ]
+        };
+
+        let currentQuestion = null;
+        let scores = { 1: 0, 2: 0 };
+        let currentValue = 0;
+
+        function initBoard() {
+            const board = document.getElementById('board');
+
+            categories.forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+                categoryDiv.textContent = category;
+                board.appendChild(categoryDiv);
+            });
+
+            for (let i = 0; i < 5; i++) {
+                categories.forEach(category => {
+                    const tile = document.createElement('div');
+                    tile.className = 'tile';
+                    tile.textContent = questions[category][i].value;
+                    tile.onclick = () => openModal(category, i);
+                    board.appendChild(tile);
+                });
+            }
+        }
+
+        function openModal(category, index) {
+            const tile = event.target;
+            if (tile.classList.contains('revealed')) return;
+
+            currentQuestion = questions[category][index];
+            currentValue = currentQuestion.value;
+
+            document.getElementById('modalValue').textContent = `$${currentQuestion.value}`;
+            document.getElementById('modalQuestion').textContent = currentQuestion.question;
+            document.getElementById('modalAnswer').textContent = currentQuestion.answer || "Answer to be filled in!";
+            document.getElementById('modalAnswer').classList.remove('visible');
+            document.getElementById('showAnswerBtn').style.display = 'inline-block';
+            document.getElementById('modal').classList.add('active');
+
+            tile.classList.add('revealed');
+        }
+
+        function showAnswer() {
+            document.getElementById('modalAnswer').classList.add('visible');
+            document.getElementById('showAnswerBtn').style.display = 'none';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            currentQuestion = null;
+            currentValue = 0;
+        }
+
+        function adjustScore(team, action) {
+            if (action === 'add') {
+                scores[team] += currentValue || 100;
+            } else if (action === 'subtract') {
+                scores[team] -= currentValue || 100;
+            }
+            document.getElementById(`score${team}`).textContent = scores[team];
+        }
+
+        function resetScore(team) {
+            scores[team] = 0;
+            document.getElementById(`score${team}`).textContent = scores[team];
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        initBoard();
+    </script>
+</body>
+</html>
