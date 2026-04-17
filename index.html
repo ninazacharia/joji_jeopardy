@@ -35,7 +35,7 @@
         }
 
         body::before {
-            content: '✨ ⭐ 🤠 💕 👢 ✨ ⭐ 🤠 💕 👢 ✨ ⭐ 🤠 💕 👢 ✨ ⭐';
+            content: '✨ ⭐ 🤠 💕 ✨ ⭐ 🤠 💕 ✨ ⭐ 🤠 💕 ✨ ⭐';
             position: fixed;
             top: 0;
             left: 0;
@@ -88,11 +88,25 @@
         }
 
         h1::before {
-            content: '👢 ';
+            content: '';
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            background: url('emojis.com pink-cowgirl-boots-.png') no-repeat center;
+            background-size: contain;
+            margin-right: 15px;
+            vertical-align: middle;
         }
 
         h1::after {
-            content: ' 👢';
+            content: '';
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            background: url('emojis.com pink-cowgirl-boots-.png') no-repeat center;
+            background-size: contain;
+            margin-left: 15px;
+            vertical-align: middle;
         }
 
         .subtitle {
@@ -383,12 +397,15 @@
         }
 
         .score::before {
-            content: '👢';
+            content: '';
             position: absolute;
-            top: -15px;
+            top: -20px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 2rem;
+            width: 40px;
+            height: 40px;
+            background: url('emojis.com pink-cowgirl-boots-.png') no-repeat center;
+            background-size: contain;
         }
 
         .team-name-input {
@@ -531,8 +548,8 @@
                 <button class="btn btn-close" onclick="closeModal()">Close</button>
             </div>
             <div class="modal-buttons" id="teamButtons" style="display: none;">
-                <button class="btn btn-team1" id="teamBtn1" onclick="awardPoints(1)">Team 1 Gets Points! 👢</button>
-                <button class="btn btn-team2" id="teamBtn2" onclick="awardPoints(2)">Team 2 Gets Points! 👢</button>
+                <button class="btn btn-team1" id="teamBtn1" onclick="awardPoints(1)">Team 1 Gets Points! <img src="emojis.com pink-cowgirl-boots-.png" style="width: 24px; height: 24px; vertical-align: middle; margin-left: 5px;"></button>
+                <button class="btn btn-team2" id="teamBtn2" onclick="awardPoints(2)">Team 2 Gets Points! <img src="emojis.com pink-cowgirl-boots-.png" style="width: 24px; height: 24px; vertical-align: middle; margin-left: 5px;"></button>
                 <button class="btn btn-nobody" onclick="nobodyGotIt()">Nobody Got It Right 😔</button>
             </div>
         </div>
@@ -628,8 +645,8 @@
 
                 if (teamName1El) teamName1El.value = teamNames[1];
                 if (teamName2El) teamName2El.value = teamNames[2];
-                if (teamBtn1El) teamBtn1El.textContent = `${teamNames[1]} Gets Points! 👢`;
-                if (teamBtn2El) teamBtn2El.textContent = `${teamNames[2]} Gets Points! 👢`;
+                if (teamBtn1El) teamBtn1El.innerHTML = `${teamNames[1]} Gets Points! <img src="emojis.com pink-cowgirl-boots-.png" style="width: 24px; height: 24px; vertical-align: middle; margin-left: 5px;">`;
+                if (teamBtn2El) teamBtn2El.innerHTML = `${teamNames[2]} Gets Points! <img src="emojis.com pink-cowgirl-boots-.png" style="width: 24px; height: 24px; vertical-align: middle; margin-left: 5px;">`;
                 console.log('Loaded team names:', teamNames);
             }
 
@@ -745,7 +762,7 @@
         function updateTeamName(team) {
             const newName = document.getElementById(`teamName${team}`).value || `Team ${team}`;
             teamNames[team] = newName;
-            document.getElementById(`teamBtn${team}`).textContent = `${newName} Gets Points! 👢`;
+            document.getElementById(`teamBtn${team}`).innerHTML = `${newName} Gets Points! <img src="emojis.com pink-cowgirl-boots-.png" style="width: 24px; height: 24px; vertical-align: middle; margin-left: 5px;">`;
             saveGameState();
         }
 
