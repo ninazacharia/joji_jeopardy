@@ -341,6 +341,18 @@
             box-shadow: 0 6px 20px rgba(255, 105, 180, 0.8);
         }
 
+        .btn-nobody {
+            background: linear-gradient(135deg, #999 0%, #666 100%);
+            color: #fff;
+            flex: 1;
+        }
+
+        .btn-nobody:hover {
+            background: linear-gradient(135deg, #666 0%, #444 100%);
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(100, 100, 100, 0.8);
+        }
+
         .btn-clear {
             background: linear-gradient(135deg, #c44569 0%, #8b3a62 100%);
             color: #fff;
@@ -521,6 +533,7 @@
             <div class="modal-buttons" id="teamButtons" style="display: none;">
                 <button class="btn btn-team1" id="teamBtn1" onclick="awardPoints(1)">Team 1 Gets Points! 👢</button>
                 <button class="btn btn-team2" id="teamBtn2" onclick="awardPoints(2)">Team 2 Gets Points! 👢</button>
+                <button class="btn btn-nobody" onclick="nobodyGotIt()">Nobody Got It Right 😔</button>
             </div>
         </div>
     </div>
@@ -585,11 +598,17 @@
         let currentValue = 0;
         let teamNames = { 1: 'Team 1', 2: 'Team 2' };
         let revealedTiles = new Set();
+        let currentTileElement = null;
+        let currentTileId = null;
+        let answerWasShown = false;
 
         function loadGameState() {
             const savedScores = localStorage.getItem('jeopardy_scores');
             const savedTeamNames = localStorage.getItem('jeopardy_teamNames');
             const savedRevealed = localStorage.getItem('jeopardy_revealed');
+
+            console.log('Loading game state...');
+            console.log('Raw savedRevealed from localStorage:', savedRevealed);
 
             if (savedScores) {
                 scores = JSON.parse(savedScores);
@@ -597,6 +616,7 @@
                 const score2El = document.getElementById('score2');
                 if (score1El) score1El.textContent = scores[1];
                 if (score2El) score2El.textContent = scores[2];
+                console.log('Loaded scores:', scores);
             }
 
             if (savedTeamNames) {
@@ -610,17 +630,23 @@
                 if (teamName2El) teamName2El.value = teamNames[2];
                 if (teamBtn1El) teamBtn1El.textContent = `${teamNames[1]} Gets Points! 👢`;
                 if (teamBtn2El) teamBtn2El.textContent = `${teamNames[2]} Gets Points! 👢`;
+                console.log('Loaded team names:', teamNames);
             }
 
             if (savedRevealed) {
                 revealedTiles = new Set(JSON.parse(savedRevealed));
+                console.log('Loaded revealed tiles:', revealedTiles);
             }
         }
 
         function saveGameState() {
+            const revealedArray = [...revealedTiles];
+            console.log('Saving game state...');
+            console.log('Revealed tiles to save:', revealedArray);
             localStorage.setItem('jeopardy_scores', JSON.stringify(scores));
             localStorage.setItem('jeopardy_teamNames', JSON.stringify(teamNames));
-            localStorage.setItem('jeopardy_revealed', JSON.stringify([...revealedTiles]));
+            localStorage.setItem('jeopardy_revealed', JSON.stringify(revealedArray));
+            console.log('Saved to localStorage:', localStorage.getItem('jeopardy_revealed'));
         }
 
         function initBoard() {
@@ -645,6 +671,7 @@
                     tile.dataset.tileId = tileIndex;
 
                     if (revealedTiles.has(tileIndex)) {
+                        console.log('Tile', tileIndex, 'should be revealed');
                         tile.classList.add('revealed');
                     }
 
@@ -653,6 +680,7 @@
                     tileIndex++;
                 });
             }
+            console.log('Total tiles created:', tileIndex);
         }
 
         function openModal(category, index, tileId) {
@@ -661,6 +689,9 @@
 
             currentQuestion = questions[category][index];
             currentValue = currentQuestion.value;
+            currentTileElement = tile;
+            currentTileId = tileId;
+            answerWasShown = false;
 
             document.getElementById('modalValue').textContent = `$${currentQuestion.value}`;
             document.getElementById('modalQuestion').textContent = currentQuestion.question;
@@ -668,17 +699,13 @@
             document.getElementById('modalAnswer').classList.remove('visible');
             document.getElementById('showAnswerBtn').style.display = 'inline-block';
             document.getElementById('modal').classList.add('active');
-
-            tile.classList.add('revealed');
-            revealedTiles.add(tileId);
-            console.log('Added tile', tileId, 'to revealed. Set:', revealedTiles);
-            saveGameState();
         }
 
         function showAnswer() {
             document.getElementById('modalAnswer').classList.add('visible');
             document.getElementById('showAnswerBtn').style.display = 'none';
             document.getElementById('teamButtons').style.display = 'flex';
+            answerWasShown = true;
         }
 
         function closeModal() {
@@ -686,12 +713,29 @@
             document.getElementById('teamButtons').style.display = 'none';
             currentQuestion = null;
             currentValue = 0;
+            currentTileElement = null;
+            currentTileId = null;
+            answerWasShown = false;
+        }
+
+        function markTileAsRevealed() {
+            if (currentTileElement && currentTileId !== null) {
+                currentTileElement.classList.add('revealed');
+                revealedTiles.add(currentTileId);
+                console.log('Added tile', currentTileId, 'to revealed. Set:', revealedTiles);
+                saveGameState();
+            }
         }
 
         function awardPoints(team) {
             scores[team] += currentValue;
             document.getElementById(`score${team}`).textContent = scores[team];
-            saveGameState();
+            markTileAsRevealed();
+            closeModal();
+        }
+
+        function nobodyGotIt() {
+            markTileAsRevealed();
             closeModal();
         }
 
